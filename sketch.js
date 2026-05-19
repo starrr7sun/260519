@@ -44,11 +44,14 @@ function draw() {
   // 3. 繪製影像，由於已經移到中心點，繪製位置需偏移寬高的一半來達到正中心效果
   image(capture, -vWidth / 2, -vHeight / 2, vWidth, vHeight);
   
-  // 4. 確保有偵測到手勢，且在相同的座標系統下繪製關鍵點
-  if (hands.length > 0) {
+  // 4. 確保有偵測到手勢，且攝影機已讀取到寬高資訊
+  if (hands.length > 0 && capture.width > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
         
+        // 預先計算映射後的關鍵點座標，避免在迴圈中重複 map
+        let points = hand.keypoints;
+
         // 根據左右手設定顏色
         if (hand.handedness == "Left") {
           fill(255, 0, 255);
@@ -75,6 +78,7 @@ function draw() {
             let p1 = hand.keypoints[path[i]];
             let p2 = hand.keypoints[path[i + 1]];
 
+            // 使用正確的映射邏輯：從影片原始尺寸映射到畫布上的繪製區域 (-vWidth/2 ~ vWidth/2)
             let x1 = map(p1.x, 0, capture.width, -vWidth / 2, vWidth / 2); 
             let y1 = map(p1.y, 0, capture.height, -vHeight / 2, vHeight / 2);
             let x2 = map(p2.x, 0, capture.width, -vWidth / 2, vWidth / 2);
@@ -84,19 +88,14 @@ function draw() {
           }
         }
 
-        // 尋找手勢的關鍵點
+        // 繪製手勢的關鍵點（圓圈）
         noStroke(); // 畫圓點時不想要邊框
         for (let i = 0; i < hand.keypoints.length; i++) {
           let keypoint = hand.keypoints[i];
 
-          // 【關鍵等比例換算】
-          // ml5.js 偵測到的 x, y 是對應到「原始影片解析度」的座標
-          // 我們需要將它對照對應到你縮放後的 vWidth 和 vHeight 上
-          // 並且因為圖片渲染起點是 -vWidth/2，所以要加上偏移量
           let mappedX = map(keypoint.x, 0, capture.width, -vWidth / 2, vWidth / 2);
           let mappedY = map(keypoint.y, 0, capture.height, -vHeight / 2, vHeight / 2);
 
-          // 畫出關鍵點圓圈
           circle(mappedX, mappedY, 12);
         }
       }
