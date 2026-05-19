@@ -78,10 +78,10 @@ function draw() {
             let p1 = hand.keypoints[path[i]];
             let p2 = hand.keypoints[path[i + 1]];
 
-            // 使用正確的映射邏輯：從影片原始尺寸映射到畫布上的繪製區域 (-vWidth/2 ~ vWidth/2)
-            let x1 = map(p1.x, 0, capture.width, -vWidth / 2, vWidth / 2); 
+            // 修正映射方向：x=0 映射到 vWidth/2 (左), x=max 映射到 -vWidth/2 (右)
+            let x1 = map(p1.x, 0, capture.width, vWidth / 2, -vWidth / 2); 
             let y1 = map(p1.y, 0, capture.height, -vHeight / 2, vHeight / 2);
-            let x2 = map(p2.x, 0, capture.width, -vWidth / 2, vWidth / 2);
+            let x2 = map(p2.x, 0, capture.width, vWidth / 2, -vWidth / 2);
             let y2 = map(p2.y, 0, capture.height, -vHeight / 2, vHeight / 2);
 
             line(x1, y1, x2, y2);
@@ -93,7 +93,7 @@ function draw() {
         for (let i = 0; i < hand.keypoints.length; i++) {
           let keypoint = hand.keypoints[i];
 
-          let mappedX = map(keypoint.x, 0, capture.width, -vWidth / 2, vWidth / 2);
+          let mappedX = map(keypoint.x, 0, capture.width, vWidth / 2, -vWidth / 2);
           let mappedY = map(keypoint.y, 0, capture.height, -vHeight / 2, vHeight / 2);
 
           circle(mappedX, mappedY, 12);
