@@ -75,9 +75,9 @@ function draw() {
             let p1 = hand.keypoints[path[i]];
             let p2 = hand.keypoints[path[i + 1]];
 
-            let x1 = map(p1.x, 0, capture.width, vWidth / 2, -vWidth / 2); // 修正 X 座標映射，使其與翻轉後的影像對齊
+            let x1 = map(p1.x, 0, capture.width, -vWidth / 2, vWidth / 2); 
             let y1 = map(p1.y, 0, capture.height, -vHeight / 2, vHeight / 2);
-            let x2 = map(p2.x, 0, capture.width, vWidth / 2, -vWidth / 2); // 修正 X 座標映射
+            let x2 = map(p2.x, 0, capture.width, -vWidth / 2, vWidth / 2);
             let y2 = map(p2.y, 0, capture.height, -vHeight / 2, vHeight / 2);
 
             line(x1, y1, x2, y2);
@@ -93,7 +93,7 @@ function draw() {
           // ml5.js 偵測到的 x, y 是對應到「原始影片解析度」的座標
           // 我們需要將它對照對應到你縮放後的 vWidth 和 vHeight 上
           // 並且因為圖片渲染起點是 -vWidth/2，所以要加上偏移量
-          let mappedX = map(keypoint.x, 0, capture.width, vWidth / 2, -vWidth / 2); // 修正 X 座標映射
+          let mappedX = map(keypoint.x, 0, capture.width, -vWidth / 2, vWidth / 2);
           let mappedY = map(keypoint.y, 0, capture.height, -vHeight / 2, vHeight / 2);
 
           // 畫出關鍵點圓圈
