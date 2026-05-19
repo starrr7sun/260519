@@ -124,17 +124,16 @@ function draw() {
   pop(); // 恢復原有的座標系統，避免影響其他繪圖
 
   // 5. 在畫面右下角顯示數字 (放在 pop 之後才不會被鏡像翻轉)
-  if (hands.length > 0) {
-    push();
-    fill(255, 255, 0);     // 黃色文字
-    stroke(0);             // 黑色外框
-    strokeWeight(10);      // 外框粗細
-    textSize(150);         // 加大字體
-    textStyle(BOLD);       // 粗體
-    textAlign(RIGHT, BOTTOM);
-    text(detectedNumber, width - 40, height - 20);
-    pop();
-  }
+  push();
+  fill(255, 255, 0);     // 黃色文字
+  stroke(0);             // 黑色外框
+  strokeWeight(10);      // 外框粗細
+  // 根據視窗大小自動調整字體大小，確保比例適中
+  textSize(min(width, height) * 0.2); 
+  textStyle(BOLD);       // 粗體
+  textAlign(RIGHT, BOTTOM);
+  text(detectedNumber, width - 30, height - 20);
+  pop();
 }
 
 function windowResized() {
