@@ -78,13 +78,13 @@ function draw() {
             let p1 = hand.keypoints[path[i]];
             let p2 = hand.keypoints[path[i + 1]];
 
-            // 修正映射邏輯：既然 scale(-1, 1) 已經處理了鏡像，
-            // 我們只需要將影片原始座標 (0,0) 對應到影像繪製的起點 (-vWidth/2, -vHeight/2)
-            // 這樣無論視窗如何縮放或旋轉，點位都會跟隨影像區域移動
-            let x1 = map(p1.x, 0, capture.width, -vWidth / 2, vWidth / 2); 
-            let y1 = map(p1.y, 0, capture.height, -vHeight / 2, vHeight / 2);
+            // 修正旋轉與位移跟隨：使用動態計算的 vWidth/vHeight
+            // 針對「上下顛倒」問題：將 Y 軸的映射目標範圍翻轉 (由 vHeight/2 映射到 -vHeight/2)
+            // 這樣影片的頂部 (0) 會出現在顯示區域的頂部，底部會出現在底部
+            let x1 = map(p1.x, 0, capture.width, -vWidth / 2, vWidth / 2);
+            let y1 = map(p1.y, 0, capture.height, vHeight / 2, -vHeight / 2);
             let x2 = map(p2.x, 0, capture.width, -vWidth / 2, vWidth / 2);
-            let y2 = map(p2.y, 0, capture.height, -vHeight / 2, vHeight / 2);
+            let y2 = map(p2.y, 0, capture.height, vHeight / 2, -vHeight / 2);
 
             line(x1, y1, x2, y2);
           }
@@ -96,7 +96,8 @@ function draw() {
           let keypoint = hand.keypoints[i];
 
           let mappedX = map(keypoint.x, 0, capture.width, -vWidth / 2, vWidth / 2);
-          let mappedY = map(keypoint.y, 0, capture.height, -vHeight / 2, vHeight / 2);
+          // 同樣修正圓點的上下顛倒問題
+          let mappedY = map(keypoint.y, 0, capture.height, vHeight / 2, -vHeight / 2);
 
           circle(mappedX, mappedY, 12);
         }
