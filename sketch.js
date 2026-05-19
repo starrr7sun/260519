@@ -49,11 +49,12 @@ function draw() {
   // 4. 確保有偵測到手勢，且攝影機已讀取到寬高資訊
   if (hands.length > 0 && capture.width > 0) {
     for (let hand of hands) {
-      if (hand.confidence > 0.1) {
+      // 提高信心值門檻，減少誤判
+      if (hand.confidence > 0.3) {
         
         // --- 辨識手指數量 ---
         let count = 0;
-        // 食指(8)、中指(12)、無名指(16)、小指(20) 的尖端
+        // 食指(8)、中指(12)、無名指(16)、小指(20)
         // 如果尖端的 Y 座標小於 (高於) 第二關節，代表手指伸直
         if (hand.keypoints[8].y < hand.keypoints[6].y) count++;
         if (hand.keypoints[12].y < hand.keypoints[10].y) count++;
@@ -64,7 +65,7 @@ function draw() {
         let dTip = dist(hand.keypoints[4].x, hand.keypoints[4].y, hand.keypoints[17].x, hand.keypoints[17].y);
         let dBase = dist(hand.keypoints[2].x, hand.keypoints[2].y, hand.keypoints[17].x, hand.keypoints[17].y);
         if (dTip > dBase) count++;
-        detectedNumber = count;
+        detectedNumber += count; // 使用累加，支援多手辨識
         
         // 預先計算映射後的關鍵點座標，避免在迴圈中重複 map
         let points = hand.keypoints;
@@ -123,11 +124,16 @@ function draw() {
   pop(); // 恢復原有的座標系統，避免影響其他繪圖
 
   // 5. 在畫面右下角顯示數字 (放在 pop 之後才不會被鏡像翻轉)
-  if (detectedNumber > 0) {
-    fill(255, 255, 0); // 使用黃色
-    textSize(120);
+  if (hands.length > 0) {
+    push();
+    fill(255, 255, 0);     // 黃色文字
+    stroke(0);             // 黑色外框
+    strokeWeight(10);      // 外框粗細
+    textSize(150);         // 加大字體
+    textStyle(BOLD);       // 粗體
     textAlign(RIGHT, BOTTOM);
     text(detectedNumber, width - 40, height - 20);
+    pop();
   }
 }
 
