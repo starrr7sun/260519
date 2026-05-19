@@ -78,12 +78,13 @@ function draw() {
             let p1 = hand.keypoints[path[i]];
             let p2 = hand.keypoints[path[i + 1]];
 
-            // 修正映射：在 scale(-1, 1) 的座標系下，
-            // 影像左側 (x=0) 對應繪製起始點 -vWidth/2
-            // 影像頂端 (y=0) 對應繪製起始點 -vHeight/2
-            let x1 = map(p1.x, 0, capture.width, -vWidth / 2, vWidth / 2); 
+            // 修正映射邏輯：
+            // 為了對齊 scale(-1, 1) 後的鏡像影像：
+            // X 軸：影片的 0 (左) 映射到 vWidth/2，影片的 width (右) 映射到 -vWidth/2
+            // Y 軸：影片的 0 (頂) 映射到 -vHeight/2，影片的 height (底) 映射到 vHeight/2
+            let x1 = map(p1.x, 0, capture.width, vWidth / 2, -vWidth / 2); 
             let y1 = map(p1.y, 0, capture.height, -vHeight / 2, vHeight / 2);
-            let x2 = map(p2.x, 0, capture.width, -vWidth / 2, vWidth / 2);
+            let x2 = map(p2.x, 0, capture.width, vWidth / 2, -vWidth / 2);
             let y2 = map(p2.y, 0, capture.height, -vHeight / 2, vHeight / 2);
 
             line(x1, y1, x2, y2);
@@ -95,7 +96,7 @@ function draw() {
         for (let i = 0; i < hand.keypoints.length; i++) {
           let keypoint = hand.keypoints[i];
 
-          let mappedX = map(keypoint.x, 0, capture.width, -vWidth / 2, vWidth / 2);
+          let mappedX = map(keypoint.x, 0, capture.width, vWidth / 2, -vWidth / 2);
           let mappedY = map(keypoint.y, 0, capture.height, -vHeight / 2, vHeight / 2);
 
           circle(mappedX, mappedY, 12);
