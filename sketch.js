@@ -2,6 +2,7 @@
 let handPose;
 let hands = [];
 let capture;
+let detectedNumber = 0; // 存儲偵測到的數字
 
 function preload() {
   // 初始化 HandPose 模型，設定 flipped: true 讓它跟著你的翻轉邏輯
@@ -33,6 +34,7 @@ function draw() {
 
   let vWidth = width * 0.5;
   let vHeight = height * 0.5;
+  detectedNumber = 0; // 每幀重置數字
 
   push();
   // 1. 將座標原點移到畫布中心
@@ -48,6 +50,21 @@ function draw() {
   if (hands.length > 0 && capture.width > 0) {
     for (let hand of hands) {
       if (hand.confidence > 0.1) {
+        
+        // --- 辨識手指數量 ---
+        let count = 0;
+        // 食指(8)、中指(12)、無名指(16)、小指(20) 的尖端
+        // 如果尖端的 Y 座標小於 (高於) 第二關節，代表手指伸直
+        if (hand.keypoints[8].y < hand.keypoints[6].y) count++;
+        if (hand.keypoints[12].y < hand.keypoints[10].y) count++;
+        if (hand.keypoints[16].y < hand.keypoints[14].y) count++;
+        if (hand.keypoints[20].y < hand.keypoints[18].y) count++;
+        
+        // 大拇指(4)：判斷尖端與小指基部(17)的距離是否大於大拇指關節(2)與小指基部的距離
+        let dTip = dist(hand.keypoints[4].x, hand.keypoints[4].y, hand.keypoints[17].x, hand.keypoints[17].y);
+        let dBase = dist(hand.keypoints[2].x, hand.keypoints[2].y, hand.keypoints[17].x, hand.keypoints[17].y);
+        if (dTip > dBase) count++;
+        detectedNumber = count;
         
         // 預先計算映射後的關鍵點座標，避免在迴圈中重複 map
         let points = hand.keypoints;
@@ -104,6 +121,14 @@ function draw() {
     }
   }
   pop(); // 恢復原有的座標系統，避免影響其他繪圖
+
+  // 5. 在畫面右下角顯示數字 (放在 pop 之後才不會被鏡像翻轉)
+  if (detectedNumber > 0) {
+    fill(255, 255, 0); // 使用黃色
+    textSize(120);
+    textAlign(RIGHT, BOTTOM);
+    text(detectedNumber, width - 40, height - 20);
+  }
 }
 
 function windowResized() {
