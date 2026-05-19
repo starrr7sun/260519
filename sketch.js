@@ -52,12 +52,40 @@ function draw() {
         // 根據左右手設定顏色
         if (hand.handedness == "Left") {
           fill(255, 0, 255);
+          stroke(255, 0, 255); // 線條顏色與手部顏色一致
         } else {
           fill(255, 255, 0);
+          stroke(255, 255, 0);
         }
-        noStroke();
+
+        // --- 繪製骨架連線 ---
+        strokeWeight(2);
+        // 定義每一根手指的連線路徑 (索引值)
+        let fingers = [
+          [0, 1, 2, 3, 4],     // 大拇指
+          [0, 5, 6, 7, 8],     // 食指
+          [0, 9, 10, 11, 12],  // 中指
+          [0, 13, 14, 15, 16], // 無名指
+          [0, 17, 18, 19, 20], // 小指
+          [5, 9, 13, 17]       // 手掌基部連線
+        ];
+
+        for (let path of fingers) {
+          for (let i = 0; i < path.length - 1; i++) {
+            let p1 = hand.keypoints[path[i]];
+            let p2 = hand.keypoints[path[i + 1]];
+
+            let x1 = map(p1.x, 0, capture.width, -vWidth / 2, vWidth / 2);
+            let y1 = map(p1.y, 0, capture.height, -vHeight / 2, vHeight / 2);
+            let x2 = map(p2.x, 0, capture.width, -vWidth / 2, vWidth / 2);
+            let y2 = map(p2.y, 0, capture.height, -vHeight / 2, vHeight / 2);
+
+            line(x1, y1, x2, y2);
+          }
+        }
 
         // 尋找手勢的關鍵點
+        noStroke(); // 畫圓點時不想要邊框
         for (let i = 0; i < hand.keypoints.length; i++) {
           let keypoint = hand.keypoints[i];
 
